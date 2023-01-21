@@ -7,7 +7,7 @@
     tools:context=".AddPlacesActivity">
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/toolbarAddPlace"
+        android:id="@+id/toolbar_add_places"
         android:background="@color/color_primary"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
