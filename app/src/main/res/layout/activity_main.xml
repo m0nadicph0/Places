@@ -7,13 +7,14 @@
     tools:context=".MainActivity" >
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floatingActionButton"
+        android:id="@+id/fab_add_places"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:clickable="true"
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
-        app:srcCompat="@drawable/ic_btn_add"
+        android:backgroundTint="@color/color_light_blue"
+        android:clickable="true"
         android:contentDescription="@string/add_button"
-        android:focusable="true" />
+        android:focusable="true"
+        app:srcCompat="@drawable/ic_btn_add" />
 </FrameLayout>
