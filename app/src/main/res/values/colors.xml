@@ -8,5 +8,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 
+    <color name="primary_text_color">@color/black</color>
+    <color name="secondary_text_color">#9AA2AF</color>
+    <color name="button_background_color">@color/color_blue</color>
+    <color name="color_accent">@color/color_light_blue</color>
+
+
     <!-- #2a4d69 • #4b86b4 • #adcbe3 • #e7eff6 • #63ace5 -->
 </resources>
