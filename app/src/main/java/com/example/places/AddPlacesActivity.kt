@@ -1,19 +1,27 @@
 package com.example.places
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
+import android.content.ContentResolver
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.MediaStore
 import android.provider.Settings
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -27,6 +35,8 @@ class AddPlacesActivity : AppCompatActivity(){
     private val calendar:Calendar = Calendar.getInstance()
 
     private lateinit var dateSetListener: OnDateSetListener
+
+    private var galleryResultLauncher: ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,6 +58,18 @@ class AddPlacesActivity : AppCompatActivity(){
         onClick<AppCompatEditText>(R.id.et_date){ onSelectDate() }
         onClick<Button>(R.id.btn_add_image) { onAddImage() }
 
+        galleryResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            handleGalleryActivityResult(it)
+        }
+
+    }
+
+    private fun handleGalleryActivityResult(result: ActivityResult?) {
+        if (result!!.resultCode == Activity.RESULT_OK) {
+            val contentUri = result.data!!.data
+            val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentUri)
+            findViewById<AppCompatImageView>(R.id.iv_place_image).setImageBitmap(bitmap)
+        }
     }
 
     private fun onAddImage() {
@@ -55,18 +77,18 @@ class AddPlacesActivity : AppCompatActivity(){
             .setTitle("Specify Image Source")
             .setItems(arrayOf("Gallery", "Camera")){ dlg: DialogInterface, which: Int ->
                 when(which) {
-                    0 -> choosePhotoFromGallery()
-                    1 -> takePhotoFromCamera()
+                    0 -> onSelectFromGallery()
+                    1 -> onSelectFromCamera()
                 }
             }
             .show()
     }
 
-    private fun takePhotoFromCamera() {
+    private fun onSelectFromCamera() {
         TODO("Not yet implemented")
     }
 
-    private fun choosePhotoFromGallery() {
+    private fun onSelectFromGallery() {
         Dexter.withContext(this)
             .withPermissions(
                 Manifest.permission.CAMERA,
@@ -75,7 +97,7 @@ class AddPlacesActivity : AppCompatActivity(){
             ).withListener(object: MultiplePermissionsListener{
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                     if (report!!.areAllPermissionsGranted()) {
-                        lToast("All permissions granted, select an image from gallery")
+                        openGallery()
                     }
                 }
 
@@ -84,6 +106,11 @@ class AddPlacesActivity : AppCompatActivity(){
                 }
 
             }).onSameThread().check();
+    }
+
+    private fun openGallery() {
+        val galleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+        galleryResultLauncher!!.launch(galleryIntent)
     }
 
     private fun showRationaleDialogForPermissions() {
