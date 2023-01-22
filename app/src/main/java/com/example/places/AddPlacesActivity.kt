@@ -1,14 +1,16 @@
 package com.example.places
 
+import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
+import android.content.DialogInterface
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.EditText
+import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.Toolbar
-import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -27,17 +29,38 @@ class AddPlacesActivity : AppCompatActivity(){
             onBackPressed()
         }
 
-        dateSetListener = DatePickerDialog.OnDateSetListener { view, year, month, dayOfMonth ->
+        dateSetListener = OnDateSetListener { view, year, month, dayOfMonth ->
             calendar?.set(Calendar.YEAR, year)
             calendar?.set(Calendar.MONTH, month)
             calendar?.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             updateDateInView()
         }
 
-        val etDate = findViewById<AppCompatEditText>(R.id.et_date)
-        etDate.setOnClickListener { onSelectDate() }
+        onClick<AppCompatEditText>(R.id.et_date){ onSelectDate() }
+        onClick<Button>(R.id.btn_add_image) { onAddImage() }
 
     }
+
+    private fun onAddImage() {
+        AlertDialog.Builder(this)
+            .setTitle("Specify Image Source")
+            .setItems(arrayOf("Gallery", "Camera")){ dlg: DialogInterface, which: Int ->
+                when(which) {
+                    0 -> choosePhotoFromGallery()
+                    1 -> takePhotoFromCamera()
+                }
+            }
+            .show()
+    }
+
+    private fun takePhotoFromCamera() {
+        TODO("Not yet implemented")
+    }
+
+    private fun choosePhotoFromGallery() {
+        TODO("Not yet implemented")
+    }
+
 
     private fun updateDateInView() {
         val etDate = findViewById<AppCompatEditText>(R.id.et_date)
@@ -54,4 +77,13 @@ class AddPlacesActivity : AppCompatActivity(){
                 calendar.get(Calendar.DAY_OF_MONTH)
             ).show()
     }
+
+    private fun <T : View?> onClick(resId: Int, handler: (View?) -> Unit) {
+        findViewById<T>(resId)?.setOnClickListener(handler)
+    }
+
+    private fun lToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
 }
