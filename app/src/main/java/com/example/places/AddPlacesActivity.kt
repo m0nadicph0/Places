@@ -1,16 +1,25 @@
 package com.example.places
 
+import android.Manifest
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
 import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.Toolbar
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -58,7 +67,41 @@ class AddPlacesActivity : AppCompatActivity(){
     }
 
     private fun choosePhotoFromGallery() {
-        TODO("Not yet implemented")
+        Dexter.withContext(this)
+            .withPermissions(
+                Manifest.permission.CAMERA,
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ).withListener(object: MultiplePermissionsListener{
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    if (report!!.areAllPermissionsGranted()) {
+                        lToast("All permissions granted, select an image from gallery")
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(permissions: MutableList<PermissionRequest>?, token: PermissionToken?) {
+                    showRationaleDialogForPermissions()
+                }
+
+            }).onSameThread().check();
+    }
+
+    private fun showRationaleDialogForPermissions() {
+        AlertDialog.Builder(this)
+            .setTitle("Permissions")
+            .setMessage("Seems you have denied permissions required by the app. You can enable the permissions from settings.")
+            .setPositiveButton("Go to settings") { dlg, _ ->
+                dlg.dismiss()
+                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                intent.data = Uri.fromParts("package", packageName, null)
+                startActivity(intent)
+            }
+            .setNegativeButton("Cancel") { dlg, _ ->
+                dlg.dismiss()
+            }
+            .setCancelable(false)
+            .show()
+
     }
 
 
@@ -87,3 +130,5 @@ class AddPlacesActivity : AppCompatActivity(){
     }
 
 }
+
+
