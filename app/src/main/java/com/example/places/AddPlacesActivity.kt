@@ -5,22 +5,23 @@ import android.app.Activity
 import android.app.AlertDialog
 import android.app.DatePickerDialog
 import android.app.DatePickerDialog.OnDateSetListener
-import android.content.ContentResolver
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.DialogInterface
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
+import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
@@ -29,10 +30,15 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
 
+
 class AddPlacesActivity : AppCompatActivity(){
+
     private val calendar:Calendar = Calendar.getInstance()
 
     private lateinit var dateSetListener: OnDateSetListener
@@ -74,6 +80,8 @@ class AddPlacesActivity : AppCompatActivity(){
     private fun handleCameraActivityResult(result: ActivityResult?) {
         if (result!!.resultCode == Activity.RESULT_OK) {
             val thumbnail = result.data!!.extras!!.get("data") as Bitmap
+            val path = saveImageToInternalStorage(thumbnail)
+            Log.i("CAMERA", path.toString())
             findViewById<AppCompatImageView>(R.id.iv_place_image).setImageBitmap(thumbnail)
         }
     }
@@ -82,6 +90,8 @@ class AddPlacesActivity : AppCompatActivity(){
         if (result!!.resultCode == Activity.RESULT_OK) {
             val contentUri = result.data!!.data
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentUri)
+            val path = saveImageToInternalStorage(bitmap)
+            Log.i("GALLERY", path.toString())
             findViewById<AppCompatImageView>(R.id.iv_place_image).setImageBitmap(bitmap)
         }
     }
@@ -188,6 +198,26 @@ class AddPlacesActivity : AppCompatActivity(){
 
     private fun lToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+    }
+
+    private fun saveImageToInternalStorage(image: Bitmap): Uri {
+        val ctxWrapper = ContextWrapper(applicationContext)
+        val dir = ctxWrapper.getDir(PLACES_IMAGES, Context.MODE_PRIVATE)
+        val file = File(dir, "${UUID.randomUUID()}.jpeg")
+        try {
+            val fsStream  = FileOutputStream(file)
+            image.compress(Bitmap.CompressFormat.JPEG, 100, fsStream)
+            fsStream.flush()
+            fsStream.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+
+        return Uri.parse(file.absolutePath)
+    }
+
+    companion object {
+        private const val PLACES_IMAGES = "PlacesImages"
     }
 
 }
