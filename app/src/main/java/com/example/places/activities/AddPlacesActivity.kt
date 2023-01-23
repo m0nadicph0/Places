@@ -48,6 +48,10 @@ class AddPlacesActivity : AppCompatActivity(){
 
     private var cameraResultLauncher: ActivityResultLauncher<Intent>? = null
 
+    private var externalImagePath = ""
+    private var latitude = 0.0
+    private var longitude = 0.0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_places)
@@ -67,6 +71,7 @@ class AddPlacesActivity : AppCompatActivity(){
 
         onClick<AppCompatEditText>(R.id.et_date){ onSelectDate() }
         onClick<Button>(R.id.btn_add_image) { onAddImage() }
+        onClick<Button>(R.id.btn_save){ onSaveImage() }
 
         galleryResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             handleGalleryActivityResult(it)
@@ -78,11 +83,15 @@ class AddPlacesActivity : AppCompatActivity(){
 
     }
 
+    private fun onSaveImage() {
+
+    }
+
     private fun handleCameraActivityResult(result: ActivityResult?) {
         if (result!!.resultCode == Activity.RESULT_OK) {
             val thumbnail = result.data!!.extras!!.get("data") as Bitmap
-            val path = saveImageToInternalStorage(thumbnail)
-            Log.i("CAMERA", path.toString())
+            externalImagePath = saveImageToInternalStorage(thumbnail).toString()
+            Log.i("CAMERA", externalImagePath.toString())
             findViewById<AppCompatImageView>(R.id.iv_place_image).setImageBitmap(thumbnail)
         }
     }
@@ -91,8 +100,8 @@ class AddPlacesActivity : AppCompatActivity(){
         if (result!!.resultCode == Activity.RESULT_OK) {
             val contentUri = result.data!!.data
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentUri)
-            val path = saveImageToInternalStorage(bitmap)
-            Log.i("GALLERY", path.toString())
+            externalImagePath = saveImageToInternalStorage(bitmap).toString()
+            Log.i("GALLERY", externalImagePath)
             findViewById<AppCompatImageView>(R.id.iv_place_image).setImageBitmap(bitmap)
         }
     }
