@@ -17,6 +17,7 @@ import android.provider.Settings
 import android.util.Log
 import android.view.View
 import android.widget.Button
+import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -26,6 +27,8 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.appcompat.widget.Toolbar
 import com.example.places.R
+import com.example.places.database.DatabaseHandler
+import com.example.places.models.Place
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
@@ -84,6 +87,21 @@ class AddPlacesActivity : AppCompatActivity(){
     }
 
     private fun onSaveImage() {
+        val title = findViewById<EditText>(R.id.et_title).text.toString()
+        val description = findViewById<EditText>(R.id.et_description).text.toString()
+        val date = findViewById<EditText>(R.id.et_date).text.toString()
+        val location = findViewById<EditText>(R.id.et_location).text.toString()
+
+        val place = Place(0, title, externalImagePath, description, date, location, latitude, longitude)
+        val dbh = DatabaseHandler(this)
+        val result = dbh.addPlace(place)
+
+        if (result > 0 ) {
+            lToast("Place was saved.")
+            finish()
+        } else {
+            lToast("failed to save place")
+        }
 
     }
 

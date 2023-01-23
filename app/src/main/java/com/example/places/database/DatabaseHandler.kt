@@ -4,13 +4,12 @@ import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.database.sqlite.SQLiteDatabase
-import android.database.sqlite.SQLiteDatabase.CursorFactory
 import android.database.sqlite.SQLiteOpenHelper
 import com.example.places.models.Place
 
 
-class DatabaseHandler(context: Context, factory: CursorFactory):
-    SQLiteOpenHelper(context, DBNAME, factory, DB_VERSION) {
+class DatabaseHandler(context: Context):
+    SQLiteOpenHelper(context, DBNAME, null, DB_VERSION) {
 
 
     override fun onCreate(db: SQLiteDatabase?) {
@@ -33,7 +32,7 @@ class DatabaseHandler(context: Context, factory: CursorFactory):
         onCreate(db)
     }
 
-    fun addPlace(place: Place) {
+    fun addPlace(place: Place):Long {
         val values = ContentValues()
         values.put(TITLE_COl, place.title)
         values.put(IMAGE_COL, place.image)
@@ -44,8 +43,9 @@ class DatabaseHandler(context: Context, factory: CursorFactory):
         values.put(LONGITUDE_COL, place.longitude)
 
         val db = this.writableDatabase
-        db.insert(TABLE_NAME, null, values)
+        val result = db.insert(TABLE_NAME, null, values)
         db.close()
+        return result
     }
 
     fun fetchAll(): List<Place> {
