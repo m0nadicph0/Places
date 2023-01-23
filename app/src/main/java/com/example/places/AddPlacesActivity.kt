@@ -8,6 +8,7 @@ import android.app.DatePickerDialog.OnDateSetListener
 import android.content.ContentResolver
 import android.content.DialogInterface
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
@@ -38,6 +39,8 @@ class AddPlacesActivity : AppCompatActivity(){
 
     private var galleryResultLauncher: ActivityResultLauncher<Intent>? = null
 
+    private var cameraResultLauncher: ActivityResultLauncher<Intent>? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_places)
@@ -62,6 +65,17 @@ class AddPlacesActivity : AppCompatActivity(){
             handleGalleryActivityResult(it)
         }
 
+        cameraResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            handleCameraActivityResult(it)
+        }
+
+    }
+
+    private fun handleCameraActivityResult(result: ActivityResult?) {
+        if (result!!.resultCode == Activity.RESULT_OK) {
+            val thumbnail = result.data!!.extras!!.get("data") as Bitmap
+            findViewById<AppCompatImageView>(R.id.iv_place_image).setImageBitmap(thumbnail)
+        }
     }
 
     private fun handleGalleryActivityResult(result: ActivityResult?) {
@@ -85,13 +99,28 @@ class AddPlacesActivity : AppCompatActivity(){
     }
 
     private fun onSelectFromCamera() {
-        TODO("Not yet implemented")
+        Dexter.withContext(this)
+            .withPermissions(
+                Manifest.permission.CAMERA,
+            ).withListener(object: MultiplePermissionsListener{
+                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                    if (report!!.areAllPermissionsGranted()) {
+                        openCamera()
+                    }
+                }
+
+                override fun onPermissionRationaleShouldBeShown(permissions: MutableList<PermissionRequest>?, token: PermissionToken?) {
+                    showRationaleDialogForPermissions()
+                }
+
+            }).onSameThread().check();
     }
+
+
 
     private fun onSelectFromGallery() {
         Dexter.withContext(this)
             .withPermissions(
-                Manifest.permission.CAMERA,
                 Manifest.permission.READ_EXTERNAL_STORAGE,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE
             ).withListener(object: MultiplePermissionsListener{
@@ -106,6 +135,11 @@ class AddPlacesActivity : AppCompatActivity(){
                 }
 
             }).onSameThread().check();
+    }
+
+    private fun openCamera() {
+        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        cameraResultLauncher!!.launch(cameraIntent)
     }
 
     private fun openGallery() {
