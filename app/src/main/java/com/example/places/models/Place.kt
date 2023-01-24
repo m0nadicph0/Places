@@ -1,5 +1,7 @@
 package com.example.places.models
 
+import java.io.Serializable
+
 data class Place(
     val id: Int,
     val title: String,
@@ -9,4 +11,4 @@ data class Place(
     val location: String,
     val latitude: Double,
     val longitude: Double
-)
+): Serializable

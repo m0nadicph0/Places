@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         adapter.setOnCLickListener(object : OnClickListener{
             override fun onClick(position: Int, model: Place) {
                 val intent = Intent(this@MainActivity, ViewPlaceActivity::class.java)
+                intent.putExtra("place_detail", model)
                 startActivity(intent)
             }
         })
