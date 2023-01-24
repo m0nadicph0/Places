@@ -9,6 +9,7 @@ import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.places.adapters.OnClickListener
 import com.example.places.adapters.PlacesAdapter
 import com.example.places.database.DatabaseHandler
 import com.example.places.databinding.ActivityMainBinding
@@ -56,6 +57,12 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupRecyclerView(places: List<Place>) {
         val adapter = PlacesAdapter(this, places)
+        adapter.setOnCLickListener(object : OnClickListener{
+            override fun onClick(position: Int, model: Place) {
+                val intent = Intent(this@MainActivity, ViewPlaceActivity::class.java)
+                startActivity(intent)
+            }
+        })
         binding?.rvPlacesList?.visibility = View.VISIBLE
         binding?.rvPlacesList?.layoutManager = LinearLayoutManager(this)
         binding?.rvPlacesList?.setHasFixedSize(true)
