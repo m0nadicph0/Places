@@ -4,33 +4,30 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
-import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.example.places.R
 import com.example.places.adapters.PlacesAdapter
 import com.example.places.database.DatabaseHandler
+import com.example.places.databinding.ActivityMainBinding
 import com.example.places.models.Place
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class MainActivity : AppCompatActivity() {
+    private var binding: ActivityMainBinding? = null
     private var resultLauncher: ActivityResultLauncher<Intent>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding?.root)
 
         resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
             handleActivityResult(it)
         }
 
-        findViewById<FloatingActionButton>(R.id.fab_add_places).setOnClickListener{
+        binding?.fabAddPlaces?.setOnClickListener{
             val intent = Intent(this, AddPlacesActivity::class.java)
             resultLauncher!!.launch(intent)
         }
@@ -51,19 +48,18 @@ class MainActivity : AppCompatActivity() {
         if (places.isNotEmpty()) {
             setupRecyclerView(places)
         } else {
-            findViewById<RecyclerView>(R.id.rv_places_list).visibility = View.GONE
-            findViewById<TextView>(R.id.tv_record_not_available).visibility = View.VISIBLE
+            binding?.rvPlacesList?.visibility = View.GONE
+            binding?.tvRecordNotAvailable?.visibility = View.VISIBLE
         }
 
     }
 
     private fun setupRecyclerView(places: List<Place>) {
         val adapter = PlacesAdapter(this, places)
-        val rvPlaces = findViewById<RecyclerView>(R.id.rv_places_list)
-        rvPlaces.visibility = View.VISIBLE
-        rvPlaces.layoutManager = LinearLayoutManager(this)
-        rvPlaces.setHasFixedSize(true)
-        rvPlaces.adapter = adapter
-        findViewById<TextView>(R.id.tv_record_not_available).visibility = View.GONE
+        binding?.rvPlacesList?.visibility = View.VISIBLE
+        binding?.rvPlacesList?.layoutManager = LinearLayoutManager(this)
+        binding?.rvPlacesList?.setHasFixedSize(true)
+        binding?.rvPlacesList?.adapter = adapter
+        binding?.tvRecordNotAvailable?.visibility = View.GONE
     }
 }

@@ -25,9 +25,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.appcompat.widget.AppCompatImageView
-import androidx.appcompat.widget.Toolbar
 import com.example.places.R
 import com.example.places.database.DatabaseHandler
+import com.example.places.databinding.ActivityAddPlacesBinding
 import com.example.places.models.Place
 import com.karumi.dexter.Dexter
 import com.karumi.dexter.MultiplePermissionsReport
@@ -43,6 +43,8 @@ import java.util.*
 
 class AddPlacesActivity : AppCompatActivity(){
 
+    private var binding: ActivityAddPlacesBinding? = null
+
     private val calendar:Calendar = Calendar.getInstance()
 
     private lateinit var dateSetListener: OnDateSetListener
@@ -57,40 +59,43 @@ class AddPlacesActivity : AppCompatActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_places)
-        val toolbarAddPlaces = findViewById<Toolbar>(R.id.toolbar_add_places)
-        setSupportActionBar(toolbarAddPlaces)
+        binding = ActivityAddPlacesBinding.inflate(layoutInflater)
+        setContentView(binding?.root)
+
+        setSupportActionBar(binding?.toolbarAddPlaces)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        toolbarAddPlaces.setNavigationOnClickListener {
+        binding?.toolbarAddPlaces?.setNavigationOnClickListener {
             onBackPressed()
         }
 
         dateSetListener = OnDateSetListener { view, year, month, dayOfMonth ->
-            calendar?.set(Calendar.YEAR, year)
-            calendar?.set(Calendar.MONTH, month)
-            calendar?.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, month)
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
             updateDateInView()
         }
 
-        onClick<AppCompatEditText>(R.id.et_date){ onSelectDate() }
-        onClick<Button>(R.id.btn_add_image) { onAddImage() }
-        onClick<Button>(R.id.btn_save){ onSaveImage() }
+        binding?.etDate?.setOnClickListener{onSelectDate()}
+        binding?.btnAddImage?.setOnClickListener { onAddImage() }
+        binding?.btnSave?.setOnClickListener { onSaveImage() }
 
-        galleryResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            handleGalleryActivityResult(it)
-        }
+        galleryResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                handleGalleryActivityResult(it)
+            }
 
-        cameraResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            handleCameraActivityResult(it)
-        }
+        cameraResultLauncher =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                handleCameraActivityResult(it)
+            }
 
     }
 
     private fun onSaveImage() {
-        val title = findViewById<EditText>(R.id.et_title).text.toString()
-        val description = findViewById<EditText>(R.id.et_description).text.toString()
-        val date = findViewById<EditText>(R.id.et_date).text.toString()
-        val location = findViewById<EditText>(R.id.et_location).text.toString()
+        val title = binding?.etTitle?.text.toString()
+        val description = binding?.etDescription?.text.toString()
+        val date = binding?.etDate?.text.toString()
+        val location = binding?.etLocation?.text.toString()
 
         val place = Place(0, title, externalImagePath, description, date, location, latitude, longitude)
         val dbh = DatabaseHandler(this)
@@ -110,7 +115,7 @@ class AddPlacesActivity : AppCompatActivity(){
             val thumbnail = result.data!!.extras!!.get("data") as Bitmap
             externalImagePath = saveImageToInternalStorage(thumbnail).toString()
             Log.i("CAMERA", externalImagePath.toString())
-            findViewById<AppCompatImageView>(R.id.iv_place_image).setImageBitmap(thumbnail)
+            binding?.ivPlaceImage?.setImageBitmap(thumbnail)
         }
     }
 
@@ -119,8 +124,7 @@ class AddPlacesActivity : AppCompatActivity(){
             val contentUri = result.data!!.data
             val bitmap = MediaStore.Images.Media.getBitmap(this.contentResolver, contentUri)
             externalImagePath = saveImageToInternalStorage(bitmap).toString()
-            Log.i("GALLERY", externalImagePath)
-            findViewById<AppCompatImageView>(R.id.iv_place_image).setImageBitmap(bitmap)
+            binding?.ivPlaceImage?.setImageBitmap(bitmap)
         }
     }
 
@@ -205,9 +209,8 @@ class AddPlacesActivity : AppCompatActivity(){
 
 
     private fun updateDateInView() {
-        val etDate = findViewById<AppCompatEditText>(R.id.et_date)
         val sdf = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-        etDate.setText(sdf.format(calendar.time).toString())
+        binding?.etDate?.setText(sdf.format(calendar.time).toString())
     }
 
 
@@ -220,9 +223,6 @@ class AddPlacesActivity : AppCompatActivity(){
             ).show()
     }
 
-    private fun <T : View?> onClick(resId: Int, handler: (View?) -> Unit) {
-        findViewById<T>(resId)?.setOnClickListener(handler)
-    }
 
     private fun lToast(message: String) {
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
