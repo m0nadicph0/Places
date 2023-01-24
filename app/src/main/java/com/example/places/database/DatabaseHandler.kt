@@ -101,6 +101,23 @@ class DatabaseHandler(context: Context):
         }
     }
 
+    fun updatePlace(place: Place):Long {
+        val values = ContentValues()
+        values.put(TITLE_COl, place.title)
+        values.put(IMAGE_COL, place.image)
+        values.put(DESCRIPTION_COl, place.description)
+        values.put(DATE_COL, place.date)
+        values.put(LOCATION_COl, place.location)
+        values.put(LATITUDE_COL, place.latitude)
+        values.put(LONGITUDE_COL, place.longitude)
+
+        val db = this.writableDatabase
+        val clause = "id=${place.id}"
+        val result = db.update(TABLE_NAME, values, clause, null)
+        db.close()
+        return result.toLong()
+    }
+
     companion object {
         private const val DBNAME = "places_db"
         private const val DB_VERSION = 1

@@ -15,17 +15,11 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.provider.Settings
 import android.util.Log
-import android.view.View
-import android.widget.Button
-import android.widget.EditText
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.appcompat.widget.AppCompatImageView
-import com.example.places.R
 import com.example.places.database.DatabaseHandler
 import com.example.places.databinding.ActivityAddPlacesBinding
 import com.example.places.models.Place
@@ -77,7 +71,7 @@ class AddPlacesActivity : AppCompatActivity(){
 
         binding?.etDate?.setOnClickListener{onSelectDate()}
         binding?.btnAddImage?.setOnClickListener { onAddImage() }
-        binding?.btnSave?.setOnClickListener { onSaveImage() }
+        binding?.btnSave?.setOnClickListener { onSavePlace() }
 
         galleryResultLauncher =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -89,17 +83,30 @@ class AddPlacesActivity : AppCompatActivity(){
                 handleCameraActivityResult(it)
             }
 
+        if (intent.hasExtra("place_detail")) {
+            val place = intent.extras?.get("place_detail") as Place
+            binding?.etTitle?.setText(place.title)
+            binding?.etDescription?.setText(place.description)
+            binding?.etDate?.setText(place.date)
+            binding?.etLocation?.setText(place.location)
+            binding?.ivPlaceImage?.setImageURI(Uri.parse(place.image))
+            externalImagePath = place.image
+            supportActionBar?.title = "Edit Place"
+        }
+
     }
 
-    private fun onSaveImage() {
+    private fun onSavePlace() {
         val title = binding?.etTitle?.text.toString()
         val description = binding?.etDescription?.text.toString()
         val date = binding?.etDate?.text.toString()
         val location = binding?.etLocation?.text.toString()
 
-        val place = Place(0, title, externalImagePath, description, date, location, latitude, longitude)
+        val placeId = getPlaceId()
+        val place = Place(placeId, title, externalImagePath, description, date, location, latitude, longitude)
         val dbh = DatabaseHandler(this)
-        val result = dbh.addPlace(place)
+
+        val result = addOrUpdatePlace(dbh, place)
 
         if (result > 0 ) {
             setResult(Activity.RESULT_OK)
@@ -108,6 +115,23 @@ class AddPlacesActivity : AppCompatActivity(){
             lToast("failed to save place")
         }
 
+    }
+
+    private fun getPlaceId(): Int {
+        return if (intent.hasExtra("place_detail")) {
+            val place = intent.extras?.get("place_detail") as Place
+            place.id
+        } else {
+            0
+        }
+    }
+
+    private fun addOrUpdatePlace(dbh: DatabaseHandler, place: Place): Long {
+        if (intent.hasExtra("place_detail")) {
+            return dbh.updatePlace(place)
+        } else {
+            return dbh.addPlace(place)
+        }
     }
 
     private fun handleCameraActivityResult(result: ActivityResult?) {

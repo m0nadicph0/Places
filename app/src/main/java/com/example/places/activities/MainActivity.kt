@@ -10,6 +10,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.places.adapters.OnClickListener
+import com.example.places.adapters.OnLongClickListener
 import com.example.places.adapters.PlacesAdapter
 import com.example.places.database.DatabaseHandler
 import com.example.places.databinding.ActivityMainBinding
@@ -63,6 +64,16 @@ class MainActivity : AppCompatActivity() {
                 intent.putExtra("place_detail", model)
                 startActivity(intent)
             }
+        })
+
+        adapter.setOnLongCLickListener(object: OnLongClickListener{
+            override fun onLongClick(position: Int, model: Place): Boolean {
+                val intent = Intent(this@MainActivity, AddPlacesActivity::class.java)
+                intent.putExtra("place_detail", model)
+                resultLauncher!!.launch(intent)
+                return true
+            }
+
         })
         binding?.rvPlacesList?.visibility = View.VISIBLE
         binding?.rvPlacesList?.layoutManager = LinearLayoutManager(this)

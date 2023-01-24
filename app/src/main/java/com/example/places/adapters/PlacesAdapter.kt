@@ -12,6 +12,7 @@ import de.hdodenhof.circleimageview.CircleImageView
 
 class PlacesAdapter(private val context: Context, private val dataset: List<Place>): RecyclerView.Adapter<PlacesHolder>() {
     private var onClickListener: OnClickListener? = null
+    private var onLongClickListener: OnLongClickListener? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlacesHolder {
         return PlacesHolder(LayoutInflater.from(context).inflate(R.layout.item_place, parent, false))
@@ -25,6 +26,9 @@ class PlacesAdapter(private val context: Context, private val dataset: List<Plac
         holder.itemView.setOnClickListener{
             onClickListener?.onClick(position, model)
         }
+        holder.itemView.setOnLongClickListener{
+            onLongClickListener?.onLongClick(position, model)!!
+        }
     }
 
     override fun getItemCount(): Int {
@@ -33,5 +37,9 @@ class PlacesAdapter(private val context: Context, private val dataset: List<Plac
 
     fun setOnCLickListener(listener: OnClickListener) {
         onClickListener = listener
+    }
+
+    fun setOnLongCLickListener(listener: OnLongClickListener) {
+        onLongClickListener = listener
     }
 }
