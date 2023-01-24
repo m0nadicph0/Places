@@ -97,7 +97,7 @@ class AddPlacesActivity : AppCompatActivity(){
         val result = dbh.addPlace(place)
 
         if (result > 0 ) {
-            lToast("Place was saved.")
+            setResult(Activity.RESULT_OK)
             finish()
         } else {
             lToast("failed to save place")

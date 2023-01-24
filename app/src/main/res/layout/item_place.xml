@@ -7,7 +7,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
-        android:layout_marginEnd="2dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
         android:background="@color/white"
         app:cardUseCompatPadding="true"
         app:cardCornerRadius="5dp"
@@ -24,8 +25,8 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/civ_place"
-                android:layout_width="96dp"
-                android:layout_height="96dp"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:src="@drawable/ic_launcher_round"
                 app:civ_border_width="2dp"
                 app:civ_border_color="@color/color_light_blue"/>
@@ -39,6 +40,7 @@
                     android:id="@+id/tv_title"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
                     android:textSize="20sp"
                     tools:text="Title"
                     />
@@ -48,7 +50,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:textSize="12sp"
+                    android:layout_marginStart="10dp"
+                    android:textSize="18sp"
                     tools:text="Description"/>
 
 
