@@ -52,27 +52,28 @@ class DatabaseHandler(context: Context):
         val result = ArrayList<Place>()
         val cursor = readableDatabase.rawQuery("SELECT * FROM $TABLE_NAME", null)
 
-        cursor!!.moveToFirst()
-        while (cursor.moveToNext()) {
-            result.add(
-                Place(
-                    getIntValueForCol(cursor, ID_COl),
-                    getStringValueForCol(cursor, TITLE_COl),
-                    getStringValueForCol(cursor, IMAGE_COL),
-                    getStringValueForCol(cursor, DESCRIPTION_COl),
-                    getStringValueForCol(cursor, DATE_COL),
-                    getStringValueForCol(cursor, LOCATION_COl),
-                    getDoubleValueForCol(cursor, LATITUDE_COL),
-                    getDoubleValueForCol(cursor, LONGITUDE_COL)
+        if(cursor!!.moveToFirst()) {
+            do {
+                result.add(
+                    Place(
+                        getIntValueForCol(cursor, ID_COl),
+                        getStringValueForCol(cursor, TITLE_COl),
+                        getStringValueForCol(cursor, IMAGE_COL),
+                        getStringValueForCol(cursor, DESCRIPTION_COl),
+                        getStringValueForCol(cursor, DATE_COL),
+                        getStringValueForCol(cursor, LOCATION_COl),
+                        getDoubleValueForCol(cursor, LATITUDE_COL),
+                        getDoubleValueForCol(cursor, LONGITUDE_COL)
+                    )
                 )
-            )
+            } while(cursor.moveToNext())
         }
-
+        cursor.close()
         return result
     }
 
     private fun getStringValueForCol(cursor: Cursor, name: String): String {
-        val columnIndex = cursor.getColumnIndex(ID_COl)
+        val columnIndex = cursor.getColumnIndex(name)
         return if(columnIndex != -1) {
             cursor.getString(columnIndex)
         } else {
@@ -82,7 +83,7 @@ class DatabaseHandler(context: Context):
     }
 
     private fun getIntValueForCol(cursor: Cursor, name: String): Int {
-        val columnIndex = cursor.getColumnIndex(ID_COl)
+        val columnIndex = cursor.getColumnIndex(name)
         return if(columnIndex != -1) {
             cursor.getInt(columnIndex)
         } else {
@@ -92,7 +93,7 @@ class DatabaseHandler(context: Context):
     }
 
     private fun getDoubleValueForCol(cursor: Cursor, name: String): Double {
-        val columnIndex = cursor.getColumnIndex(ID_COl)
+        val columnIndex = cursor.getColumnIndex(name)
         return if(columnIndex != -1) {
             cursor.getDouble(columnIndex)
         } else {
