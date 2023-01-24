@@ -118,6 +118,14 @@ class DatabaseHandler(context: Context):
         return result.toLong()
     }
 
+    fun delete(place: Place):Long {
+        val db = this.writableDatabase
+        val clause = "id=${place.id}"
+        val result = db.delete(TABLE_NAME, clause, null)
+        db.close()
+        return result.toLong()
+    }
+
     companion object {
         private const val DBNAME = "places_db"
         private const val DB_VERSION = 1
